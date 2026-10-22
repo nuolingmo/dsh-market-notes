@@ -3,6 +3,8 @@
 给 dshmarket 里还没有备注的插件自动写一句人话中文说明，让你在插件卡片上扫一眼就知道它是干嘛的、什么时候用得上。已有备注（尤其是你手写的）一律不动，只填空。
 
 > 需要先安装并启用 [dshmarket](https://www.npmjs.com/package/dshmarket)（备注写在它的数据里）。
+>
+> GitHub 仓库：<https://github.com/nuolingmo/dsh-market-notes> · 安装包：<https://github.com/nuolingmo/dsh-market-notes/releases>
 
 ## 安装
 
@@ -17,6 +19,8 @@ dsh-market-notes
 ```sh
 dsh plugin --profile web add dsh-market-notes
 ```
+
+也可以直接从 GitHub 安装：把 Release 里的 `dsh-market-notes-1.0.0.tgz` 下载到本地，在插件页安装框填它的路径；或填 Git 地址 `git+https://github.com/nuolingmo/dsh-market-notes.git`。
 
 安装后 DSH 启动 30 秒内会自动扫一次；也可以打开 **设置 → 通用 → 插件中文备注** 点「立即扫描」。
 
