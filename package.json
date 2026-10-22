@@ -1,0 +1,57 @@
+{
+  "name": "dsh-market-notes",
+  "version": "1.0.0",
+  "description": "Auto-writes short plain-Chinese notes for installed dshmarket plugins that have none. 给 dshmarket 里还没有备注的插件自动写一句中文说明，让插件卡片一眼看懂。",
+  "type": "module",
+  "icon": "./icon.svg",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client/client.js",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "index.js",
+    "client/client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "dshmarket",
+    "plugin",
+    "notes",
+    "chinese",
+    "marketplace",
+    "cordis"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nuolingmo/dsh-market-notes.git"
+  },
+  "homepage": "https://github.com/nuolingmo/dsh-market-notes#readme",
+  "bugs": {
+    "url": "https://github.com/nuolingmo/dsh-market-notes/issues"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": ["@deepseek-ai/dsh-client-locale"]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh": "^0.2.1-rc.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

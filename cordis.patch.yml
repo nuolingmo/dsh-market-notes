@@ -1,0 +1,5 @@
+# Market Notes: fills short Chinese notes for installed dshmarket plugins
+# that have none. The market itself owns the notes store.
+- insert:
+    - id: market-notes
+      name: '@local/dsh-market-notes'
