@@ -1,7 +1,7 @@
 {
   "name": "dsh-market-notes",
   "version": "1.0.0",
-  "description": "Auto-writes short plain-Chinese notes for installed dshmarket plugins that have none. 给 dshmarket 里还没有备注的插件自动写一句中文说明，让插件卡片一眼看懂。",
+  "description": "给 dshmarket 里还没有备注的插件自动写一句中文说明（依赖 dshmarket 插件市场，不是独立插件）。Auto-writes short plain-Chinese notes for installed dshmarket plugins that have none; requires dshmarket.",
   "type": "module",
   "icon": "./icon.svg",
   "exports": {

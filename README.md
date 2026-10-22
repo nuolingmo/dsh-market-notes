@@ -2,8 +2,17 @@
 
 给 dshmarket 里还没有备注的插件自动写一句人话中文说明，让你在插件卡片上扫一眼就知道它是干嘛的、什么时候用得上。已有备注（尤其是你手写的）一律不动，只填空。
 
-> 需要先安装并启用 [dshmarket](https://www.npmjs.com/package/dshmarket)（备注写在它的数据里）。
->
+## ⚠️ 前置条件（必读）：它不是独立插件
+
+本插件是 **dshmarket（插件市场本体）的扩展**，两者必须在**同一个 DSH profile** 里，否则它没有任何作用：
+
+- 它没有自己的数据存储、没有独立页面，也**不翻译网页、聊天或任意文本**；
+- 它读取的是 dshmarket 的「已安装插件列表」和「备注数据」，写备注也走 dshmarket 的本机接口；
+- **没有安装或没有启用 dshmarket 时**：本插件可以装上，但扫描会提示「dshmarket 未安装或未运行」，不会写任何东西；
+- 它只做一件事：给 dshmarket 里**已安装的插件**补一句中文备注，显示在市场的插件卡片上。
+
+先装好并启用 dshmarket，再装本插件；生成备注还需要在 DSH 里配置好可用的默认模型。
+
 > GitHub 仓库：<https://github.com/nuolingmo/dsh-market-notes> · 安装包：<https://github.com/nuolingmo/dsh-market-notes/releases>
 
 ## 安装
