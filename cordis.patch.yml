@@ -1,5 +1,10 @@
 # Market Notes: fills short Chinese notes for installed dshmarket plugins
 # that have none. The market itself owns the notes store.
+#
+# IMPORTANT: `name` must equal package.json's `name`. This directory is the
+# single source tree (the old linked dev copy is retired); scripts/build-dist.mjs
+# derives both this name and the client module id from package.json and refuses
+# to ship an artifact where they disagree.
 - insert:
     - id: market-notes
-      name: '@local/dsh-market-notes'
+      name: 'dsh-market-notes'

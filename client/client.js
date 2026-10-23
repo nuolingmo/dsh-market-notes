@@ -5,7 +5,7 @@
  * the 「立即扫描」 button. The notes themselves appear on the market cards.
  */
 window.__ModuleLoader__.load({
-  id: '@local/dsh-market-notes',
+  id: 'dsh-market-notes',
   factory(require) {
     const React = require('react')
     const h = React.createElement
@@ -16,9 +16,12 @@ window.__ModuleLoader__.load({
 
     const DICT = {
       title: '插件中文备注',
-      description: '给 dshmarket 里还没有备注的插件自动写一句中文说明，约 60 字；已有备注不会动，扫描结果直接显示在市场卡片上。',
+      description: '给 dshmarket 里还没有备注的插件自动写一句中文说明，约 60 字；已有备注不会动，扫描结果直接显示在市场卡片上。AI 写的备注可重新生成，你手写的不会动。',
       scan: '立即扫描',
       scanning: '扫描中…',
+      regenerate: '重新生成 AI 备注',
+      regenerating: '重新生成中…',
+      regenerateHint: '只重写带 🤖 的备注',
       last: '上次扫描',
       generated: '生成 {n} 条',
       skipped: '已有 {n} 条跳过',
@@ -42,6 +45,8 @@ window.__ModuleLoader__.load({
       .dmn-btn:disabled { opacity: .55; cursor: default; }
       .dmn-btn-primary { background: var(--dsw-alias-brand-primary); border-color: var(--dsw-alias-brand-primary); color: #fff; }
       .dmn-btn-primary:hover:not(:disabled) { filter: brightness(1.06); }
+      .dmn-btn-secondary { min-width: 84px; font-size: 11.5px; padding: 4px 10px; }
+      .dmn-hint { font-size: 10.5px; line-height: 1.5; color: var(--dsw-alias-label-secondary); }
     `
 
     function apiBase() {
@@ -88,6 +93,7 @@ window.__ModuleLoader__.load({
 
     function NotesRow() {
       const [state, setState] = useState({ loading: true, scanning: false, report: null, error: null })
+      const [busyMode, setBusyMode] = useState(null) // null | 'scan' | 'ai'
       const mounted = useRef(true)
       useEffect(() => () => { mounted.current = false }, [])
 
@@ -114,13 +120,22 @@ window.__ModuleLoader__.load({
         void loadStatus()
       }, [loadStatus])
 
-      const scanNow = useCallback(async () => {
+      // While a scan is running (this row's button, the auto scan, or another
+      // tab), re-read /status every 2 s so the row never stays stuck.
+      useEffect(() => {
+        if (!state.scanning) return undefined
+        const timer = setInterval(() => { void loadStatus() }, 2000)
+        return () => clearInterval(timer)
+      }, [state.scanning, loadStatus])
+
+      const scanNow = useCallback(async (forceAi) => {
+        setBusyMode(forceAi ? 'ai' : 'scan')
         setState((previous) => ({ ...previous, scanning: true, error: null }))
         try {
           const response = await fetch(`${apiBase()}${SCAN_URL}`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: '{}',
+            body: JSON.stringify(forceAi ? { force: 'ai' } : {}),
           })
           const data = await readJson(response)
           if (!response.ok || data.ok !== true) throw new Error(data.error !== undefined ? String(data.error) : `HTTP ${response.status}`)
@@ -129,9 +144,12 @@ window.__ModuleLoader__.load({
         } catch (error) {
           if (!mounted.current) return
           setState((previous) => ({ ...previous, scanning: false, error: describeError(error) }))
+        } finally {
+          if (mounted.current) setBusyMode(null)
         }
       }, [])
 
+      const busy = busyMode !== null
       const report = state.report
       let status
       if (state.loading) {
@@ -173,11 +191,22 @@ window.__ModuleLoader__.load({
             {
               type: 'button',
               className: 'dmn-btn dmn-btn-primary',
-              disabled: state.scanning,
-              onClick: () => void scanNow(),
+              disabled: busy,
+              onClick: () => void scanNow(false),
             },
-            state.scanning ? t('scanning') : t('scan'),
+            busy ? t('scanning') : t('scan'),
           ),
+          h(
+            'button',
+            {
+              type: 'button',
+              className: 'dmn-btn dmn-btn-secondary',
+              disabled: busy,
+              onClick: () => void scanNow(true),
+            },
+            busyMode === 'ai' ? t('regenerating') : t('regenerate'),
+          ),
+          h('div', { className: 'dmn-hint' }, t('regenerateHint')),
         ),
       )
     }

@@ -29,7 +29,7 @@ dsh-market-notes
 dsh plugin --profile web add dsh-market-notes
 ```
 
-也可以直接从 GitHub 安装：把 Release 里的 `dsh-market-notes-1.0.0.tgz` 下载到本地，在插件页安装框填它的路径；或填 Git 地址 `git+https://github.com/nuolingmo/dsh-market-notes.git`。
+也可以直接从 GitHub 安装：把 Release 里的 `dsh-market-notes-1.0.1.tgz` 下载到本地，在插件页安装框填它的路径；或填 Git 地址 `git+https://github.com/nuolingmo/dsh-market-notes.git`。
 
 安装后 DSH 启动 30 秒内会自动扫一次；也可以打开 **设置 → 通用 → 插件中文备注** 点「立即扫描」。
 
@@ -37,11 +37,19 @@ dsh plugin --profile web add dsh-market-notes
 
 1. 读取当前 profile 的依赖列表，只挑 dshmarket 里**还没有备注**的插件；
 2. 从本地读取每个插件的 `package.json` 描述和 `README*.md` 第一段（缺 README 用描述，都缺则跳过并记录）；
-3. 把所有原文**一次性**交给当前默认模型，要求返回 JSON 数组（一次调用，仅对不合规项追加一次修复调用）；
+3. 把待补插件按 10 个一批分块，每批**一次**模型调用，要求返回 JSON 数组（仅对不合规项追加一次修复调用）；单批失败不会拖垮其他批次；
 4. 通过 dshmarket 自己的 `POST /dsh-market/note` 接口逐条写回；每个包写入前重新读一次备注，运行中被你手写的备注不会被覆盖；
 5. 单个插件失败不影响其他插件，最后汇总生成/跳过/失败数量。
 
 所有插件资料来自本地磁盘，不抓任何目录站点。
+
+## 重新生成 AI 备注
+
+AI 写的备注带 🤖 前缀。如果某条 AI 备注质量不满意，可以在 **设置 → 通用 → 插件中文备注** 里点 **「重新生成 AI 备注」**（或请求 `POST /dsh-market-notes/scan` 时带上 `{"force":"ai"}`）：
+
+- 只重写**以 🤖 开头**的备注；
+- 你手写的备注（没有 🤖）在默认模式和重新生成模式下**都不会被改动**；
+- 默认的「立即扫描」仍然只补空白备注。
 
 ## 备注标准
 
@@ -66,7 +74,8 @@ dsh plugin --profile web add dsh-market-notes
 
 ## 开发
 
-- Host：[`index.js`](./index.js)（扫描、单次模型调用、校验、写备注）
-- Client：[`client/client.js`](./client/client.js)（设置里的「立即扫描」行）
+- Host：[`index.js`](./index.js)（扫描、分块模型调用、校验、写备注；`force=ai` 时只重写 AI 备注）
+- Client：[`client/client.js`](./client/client.js)（设置里的「立即扫描」和「重新生成 AI 备注」）
+- 打包：`node scripts/build-dist.mjs --out <目录>` 生成 tgz/zip，脚本会把 `cordis.patch.yml` 里的 `name` 对齐 `package.json` 并解包校验
 - 临时报告：`%TEMP%\dsh-market-notes\last-run.json`、`last-model-output.txt`
-- 接口：`GET /dsh-market-notes/status`、`POST /dsh-market-notes/scan`
+- 接口：`GET /dsh-market-notes/status`、`POST /dsh-market-notes/scan`（body 或 query 支持 `force=ai`）；两个接口都校验 `Origin`，跨站请求返回 403
