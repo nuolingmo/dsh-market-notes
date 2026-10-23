@@ -1,4 +1,5 @@
 node_modules/
 *.tgz
+*.zip
 .npmrc
 npm-debug.log*
